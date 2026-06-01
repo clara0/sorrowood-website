@@ -2,8 +2,7 @@ import { useStore } from "@nanostores/react";
 import "./index.css";
 import Header from "@/components/header"
 import { $router } from "@/lib/router";
-import Post from "@/components/post";
-import Posts from "@/components/posts";
+import Page from "@/components/page";
 
 function App() {
   const page = useStore($router);
@@ -17,8 +16,8 @@ function App() {
   return <>
     <Header />
     <div>
-      {page.route === "home" && <Posts />}
-      {/* {page.route === "post" && <Post post={page.params.postId} />} */}
+      {page.route === "home" && <Page />}
+      {page.route === "post" && <Page postId={page.params.postId} />}
     </div>
   </>;
 }
