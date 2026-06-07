@@ -17,7 +17,7 @@ const Page = (props: PageProps) => {
         return <Post post={displayPost}></Post>
     }
 
-    return <Posts></Posts>
+    return <Posts />
 }
 
 export default Page;

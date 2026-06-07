@@ -16,7 +16,7 @@ const Post = (props: PostProps) => {
     }
 
     return <>
-        <Card onClick={navigateToPost}>
+        <Card onClick={navigateToPost} className="m-2">
             <CardHeader>
                 <CardTitle>{post.title}</CardTitle>
                 <CardDescription>{

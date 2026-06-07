@@ -1,51 +1,58 @@
 import { Hono } from "hono";
-
-const posts = [
-  {
-    id: 0,
-    timestamp: Date.parse("2025-12-23T10:36:00Z"),
-    title: "uwu",
-    content: "hello",
-    tags: [],
-  },
-];
-
-let nextId = 1;
+import { db } from "./db/index.js";
+import { posts } from "./db/schema.js";
+import { eq } from "drizzle-orm";
 
 export const postRoutes = new Hono();
 
 postRoutes.get("/posts", async (c) => {
-  return c.json(posts);
+  try {
+    const allPosts = await db.select().from(posts);
+    return c.json(allPosts)
+  } catch (err) {
+    console.error("Error fetching posts");
+    return c.json({ error: "Failed to fetch posts" }, 500);
+  }
 });
 
 postRoutes.get("/posts/:postId", async (c) => {
   const id = parseInt(c.req.param("postId"));
-  return c.json(posts[id]);
+  try {
+    const post = db.select({
+      id: posts.id,
+      timestamp: posts.timestamp,
+      title: posts.title,
+      content: posts.content,
+    }).from(posts).where(eq(posts.id, id)).get()
+    return c.json(post);
+  } catch (err) {
+    console.error("Error fetching post");
+    return c.json({ error: "Failed to fetch post" }, 500);
+  }
 });
 
 postRoutes.post("/posts", async (c) => {
-  const { title, content, tags } = await c.req.json();
+  const { title, content } = await c.req.json();
   const newPost = {
-    id: nextId++,
-    timestamp: new Date().getTime(),
+    timestamp: new Date(),
     title,
     content,
-    tags
   };
-  posts.push(newPost);
-  return c.json(newPost);
+  const newPushedPost = db.insert(posts).values(newPost).returning().get();
+  return c.json(newPushedPost);
 });
 
 postRoutes.delete("/posts/:postId", async (c) => {
   const id = parseInt(c.req.param("postId"));
-  const post = posts[id];
-  posts.splice(id, 1);
+  const post = await db.delete(posts).where(eq(posts.id, id)).returning().get();
   return c.json(post);
 });
 
 postRoutes.patch("/posts/:postId", async (c) => {
   const id = parseInt(c.req.param("postId"));
   const { title, content } = await c.req.json();
-  posts[id] = { ...posts[id], title, content };
-  return c.json(posts[id]);
+  const post = await db.update(posts).set({
+    title, content,
+  })
+  return c.json(post);
 });

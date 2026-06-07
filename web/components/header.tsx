@@ -14,7 +14,7 @@ const Header = () => {
     }
 
     return (
-        <div className="w-screen flex items-center justify-between px-8 py-4 border-b bg-background">
+        <div className="w-screen flex items-center justify-between px-8 py-4 border-b bg-background mb-4">
             <h1 className="text-xl font-semibold tracking-tight" onClick={navigateToUpdates}>Sorrowood</h1>
             <NavigationMenu>
                 <NavigationMenuList>
